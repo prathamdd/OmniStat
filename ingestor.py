@@ -1,48 +1,73 @@
 import time
 import json
 import redis
+import logging
 from nba_api.live.nba.endpoints import scoreboard
 
-print("--- DEBUG: Starting Script ---")
+# 1. SETUP LOGGING
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.FileHandler("ingestor.log"),
+        logging.StreamHandler()
+    ]
+)
 
+logging.info("--- 🚀 Day 2: Starting Resilient Ingestor ---")
+
+# 2. REDIS CONNECTION
 try:
     r = redis.Redis(host='localhost', port=6379, decode_responses=True)
-    r.ping() # This checks if Redis is actually alive
-    print("--- DEBUG: Redis Connected Successfully ---")
-except Exception as e:
-    print(f"--- DEBUG: Redis Connection Failed: {e} ---")
+    r.ping()
+    logging.info("✅ Redis Connection: SUCCESS")
+except redis.ConnectionError as e:
+    logging.error(f"❌ Redis Connection: FAILED. Is Docker running? Error: {e}")
+    exit()
 
 def fetch_live_scores():
-    print("--- DEBUG: Attempting to fetch NBA data... ---")
+    logging.info("Attempting to fetch NBA data...")
     try:
-        # 2. Ask the NBA for today's games
+        # 3. ASK NBA FOR DATA
         board = scoreboard.ScoreBoard()
         data = board.get_dict()
         
-        # 3. Check if there are actually games today
-        live_games = data['scoreboard']['games']
-        print(f"--- DEBUG: Found {len(live_games)} games today ---")
-        
-        if len(live_games) == 0:
-            print("--- DEBUG: No games found in the API response. ---")
+        # 4. SAFETY CHECK
+        if 'scoreboard' not in data or 'games' not in data['scoreboard']:
+            logging.warning("NBA API returned empty or unexpected data.")
+            return 
 
+        live_games = data['scoreboard']['games']
+        
+        if not live_games:
+            logging.info("No games currently scheduled.")
+            return
+
+        # 5. PROCESS THE GAMES (Fixed Indentation here!)
         for game in live_games:
+            # 1. CLEANING
+            home_team = game.get('homeTeam', {}).get('teamName', 'Unknown').upper()
+            away_team = game.get('awayTeam', {}).get('teamName', 'Unknown').upper()
+            
+            # 2. SCHEMA
             simplified_game = {
-                "id": game['gameId'],
-                "home": game['homeTeam']['teamName'],
-                "away": game['awayTeam']['teamName'],
-                "score": f"{game['awayTeam']['score']} - {game['homeTeam']['score']}",
-                "status": game['gameStatusText']
+                "game_id": game.get('gameId'),
+                "home": home_team,
+                "away": away_team,
+                "score": f"{game.get('awayTeam', {}).get('score', 0)} - {game.get('homeTeam', {}).get('score', 0)}",
+                "status": game.get('gameStatusText', 'N/A'),
+                "last_update": time.strftime("%H:%M:%S")
             }
             
             r.publish('nba_scores', json.dumps(simplified_game))
-            print(f"Success: {simplified_game['away']} vs {simplified_game['home']}")
+            logging.info(f"✅ Published: {away_team} vs {home_team} at {simplified_game['last_update']}")
 
     except Exception as e:
-        print(f"--- DEBUG: NBA API Error: {e} ---")
+        logging.error(f"Connection issue or API timeout: {e}. Retrying soon...")
 
-# The Loop
-while True:
-    fetch_live_scores()
-    print("--- DEBUG: Sleeping for 10 seconds... ---")
-    time.sleep(10)
+# 7. THE HEARTBEAT LOOP
+if __name__ == "__main__":
+    while True:
+        fetch_live_scores()
+        logging.info("Sleeping for 10 seconds...")
+        time.sleep(10)
