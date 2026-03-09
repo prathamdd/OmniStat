@@ -34,3 +34,4 @@
 /Users/prathamdesai/OmniStat/Dashboard/obj/Debug/net9.0/Dashboard.genruntimeconfig.cache
 /Users/prathamdesai/OmniStat/Dashboard/obj/Debug/net9.0/ref/Dashboard.dll
 /Users/prathamdesai/OmniStat/Dashboard/obj/Debug/net9.0/swae.build.ex.cache
+/Users/prathamdesai/OmniStat/Dashboard/obj/Debug/net9.0/Dashboard.sourcelink.json

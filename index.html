@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>OmniStat Live Dashboard</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/6.0.1/signalr.min.js"></script>
+    <style>
+        body { background: #121212; color: white; font-family: 'Segoe UI', sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        #scoreboard { background: #1e1e1e; padding: 40px; border-radius: 15px; border: 2px solid #333; text-align: center; width: 400px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .teams { font-size: 1.5rem; font-weight: bold; margin-bottom: 10px; color: #00ff88; }
+        .score { font-size: 4rem; font-weight: 900; margin: 20px 0; letter-spacing: 5px; }
+        .status { color: #888; text-transform: uppercase; font-size: 0.9rem; border-top: 1px solid #333; padding-top: 15px; }
+        .live-tag { color: red; font-weight: bold; animation: blink 1s infinite; }
+        @keyframes blink { 50% { opacity: 0; } }
+    </style>
+</head>
+<body>
+    <div id="scoreboard">
+        <div class="live-tag">● LIVE UPDATES ACTIVE</div>
+        <div id="game-title" class="teams">WAITING FOR DATA...</div>
+        <div id="game-score" class="score">00 - 00</div>
+        <div id="game-status" class="status">Initializing SignalR Stream...</div>
+    </div>
+
+<script>
+        const connection = new signalR.HubConnectionBuilder()
+            .withUrl("http://localhost:5116/scoreHub")
+            .withAutomaticReconnect()
+            .build();
+
+        connection.on("ReceiveScore", (message) => {
+            // 1. Parse the message as a LIST of games
+            const games = JSON.parse(message);
+            const container = document.getElementById("scoreboard");
+            
+            // 2. Clear the old content (except the live tag)
+            container.innerHTML = '<div class="live-tag">● LIVE UPDATES ACTIVE</div>';
+
+            // 3. Loop through every game and add it to the screen
+            games.forEach(game => {
+                const gameHtml = `
+                    <div style="border-bottom: 1px solid #333; padding: 20px; margin-bottom: 10px;">
+                        <div class="teams">${game.away} @ ${game.home}</div>
+                        <div class="score" style="font-size: 2.5rem;">${game.score}</div>
+                        <div class="status">${game.status} | ${game.last_update}</div>
+                    </div>
+                `;
+                container.insertAdjacentHTML('beforeend', gameHtml);
+            });
+        });
+
+        connection.start().catch(err => console.error(err));
+    </script>
+</body>
+</html>

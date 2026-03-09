@@ -3,6 +3,15 @@ using StackExchange.Redis;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddCors(options => {
+    options.AddDefaultPolicy(policy => {
+        policy.WithOrigins("null", "http://localhost:5500", "http://127.0.0.1:5500") // Covers Live Server
+              .AllowAnyHeader()
+              .AllowAnyMethod()
+              .AllowCredentials(); // Required for SignalR
+    });
+});
+
 // 1. ADD SERVICES (The Ingredients)
 builder.Services.AddSignalR();
 // This tells .NET to run your Redis listener in the background
@@ -32,6 +41,7 @@ app.MapGet("/scores", async (IConnectionMultiplexer redisConn) => {
     }
 });
 
+app.UseCors();
 // New Hotness: SignalR Hub address
 app.MapHub<ScoreHub>("/scoreHub");
 
