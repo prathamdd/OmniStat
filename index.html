@@ -4,15 +4,101 @@
     <meta charset="UTF-8">
     <title>OmniStat Live Dashboard</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/6.0.1/signalr.min.js"></script>
-    <style>
-        body { background: #121212; color: white; font-family: 'Segoe UI', sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-        #scoreboard { background: #1e1e1e; padding: 40px; border-radius: 15px; border: 2px solid #333; text-align: center; width: 400px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-        .teams { font-size: 1.5rem; font-weight: bold; margin-bottom: 10px; color: #00ff88; }
-        .score { font-size: 4rem; font-weight: 900; margin: 20px 0; letter-spacing: 5px; }
-        .status { color: #888; text-transform: uppercase; font-size: 0.9rem; border-top: 1px solid #333; padding-top: 15px; }
-        .live-tag { color: red; font-weight: bold; animation: blink 1s infinite; }
-        @keyframes blink { 50% { opacity: 0; } }
-    </style>
+<style>
+    /* Reset and Layout */
+    body { 
+        background: #0f0f0f; 
+        color: white; 
+        font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
+        margin: 0; 
+        padding: 40px;
+        display: flex; 
+        flex-direction: column; 
+        align-items: center; 
+        min-height: 100vh;
+    }
+
+    /* The Container: Now a flexible grid */
+    #scoreboard { 
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+        gap: 25px;
+        width: 100%;
+        max-width: 1300px;
+        margin-top: 20px;
+    }
+
+    /* Individual Game Cards */
+    .game-card { 
+        background: #1a1a1a; 
+        padding: 25px; 
+        border-radius: 20px; 
+        border: 1px solid #333; 
+        text-align: center; 
+        box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+        transition: transform 0.2s ease, border-color 0.2s ease;
+    }
+
+    .game-card:hover {
+        transform: translateY(-5px);
+        border-color: #00ff88;
+    }
+
+    /* Team Layout */
+    .team-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin: 10px 0;
+    }
+
+    .logo {
+        width: 60px;
+        height: 60px;
+        object-fit: contain;
+        filter: drop-shadow(0 4px 8px rgba(0,0,0,0.5));
+    }
+
+    .team-name {
+        font-size: 1.3rem;
+        font-weight: 700;
+        letter-spacing: 0.5px;
+    }
+
+    /* Score Styling */
+    .score-display { 
+        font-size: 2.8rem; 
+        font-weight: 900; 
+        margin: 15px 0; 
+        color: #fff;
+        background: #252525;
+        border-radius: 10px;
+        padding: 10px 0;
+        font-family: 'Courier New', monospace;
+    }
+
+    /* Meta Info */
+    .status-bar { 
+        color: #aaa; 
+        text-transform: uppercase; 
+        font-size: 0.85rem; 
+        font-weight: 600;
+        margin-top: 15px;
+        padding-top: 15px;
+        border-top: 1px solid #333;
+    }
+
+    .live-tag { 
+        color: #ff4d4d; 
+        font-weight: bold; 
+        animation: blink 1.5s infinite; 
+        font-size: 1.1rem;
+        margin-bottom: 20px;
+        text-align: center;
+    }
+
+    @keyframes blink { 50% { opacity: 0.3; } }
+</style>
 </head>
 <body>
     <div id="scoreboard">
@@ -23,33 +109,59 @@
     </div>
 
 <script>
-        const connection = new signalR.HubConnectionBuilder()
-            .withUrl("http://localhost:5116/scoreHub")
-            .withAutomaticReconnect()
-            .build();
+    const connection = new signalR.HubConnectionBuilder()
+        .withUrl("http://localhost:5116/scoreHub")
+        .withAutomaticReconnect()
+        .build();
 
-        connection.on("ReceiveScore", (message) => {
-            // 1. Parse the message as a LIST of games
-            const games = JSON.parse(message);
-            const container = document.getElementById("scoreboard");
-            
-            // 2. Clear the old content (except the live tag)
-            container.innerHTML = '<div class="live-tag">● LIVE UPDATES ACTIVE</div>';
+    // Helper to get Logos. NBA logos on this CDN follow a specific naming convention.
+    const getLogoUrl = (teamName) => {
+        let name = teamName.toLowerCase();
+        // Fix for common naming mismatches
+        if (name === "76ers") name = "philadelphia-76ers";
+        if (name === "trail blazers") name = "portland-trail-blazers";
+        
+        const slug = name.replace(/\s/g, '-');
+        return `https://loodibee.com/wp-content/uploads/nba-${slug}-logo-300x300.png`;
+    };
 
-            // 3. Loop through every game and add it to the screen
-            games.forEach(game => {
-                const gameHtml = `
-                    <div style="border-bottom: 1px solid #333; padding: 20px; margin-bottom: 10px;">
-                        <div class="teams">${game.away} @ ${game.home}</div>
-                        <div class="score" style="font-size: 2.5rem;">${game.score}</div>
-                        <div class="status">${game.status} | ${game.last_update}</div>
+    connection.on("ReceiveScore", (message) => {
+        const games = JSON.parse(message);
+        const container = document.getElementById("scoreboard");
+        
+        // Reset container
+        container.innerHTML = '<div class="live-tag" style="grid-column: 1 / -1;">● LIVE UPDATES ACTIVE</div>';
+
+        games.forEach(game => {
+            // Split the score string (e.g., "110 - 105") to compare who is winning
+            const scores = game.score.split(' - ').map(Number);
+            const awayWinning = scores[0] > scores[1];
+            const homeWinning = scores[1] > scores[0];
+
+            const gameHtml = `
+                <div class="game-card">
+                    <div class="team-row">
+                        <img src="${getLogoUrl(game.away)}" class="logo" onerror="this.src='https://via.placeholder.com/50?text=NBA'">
+                        <span class="team-name" style="color: ${awayWinning ? '#00ff88' : 'white'}">${game.away}</span>
                     </div>
-                `;
-                container.insertAdjacentHTML('beforeend', gameHtml);
-            });
+                    
+                    <div class="score-display">${game.score}</div>
+                    
+                    <div class="team-row">
+                        <img src="${getLogoUrl(game.home)}" class="logo" onerror="this.src='https://via.placeholder.com/50?text=NBA'">
+                        <span class="team-name" style="color: ${homeWinning ? '#00ff88' : 'white'}">${game.home}</span>
+                    </div>
+                    
+                    <div class="status-bar" style="margin-top: 15px; font-size: 0.8rem; color: #888;">
+                        ${game.status} • <span style="font-family: monospace;">${game.last_update}</span>
+                    </div>
+                </div>
+            `;
+            container.insertAdjacentHTML('beforeend', gameHtml);
         });
+    });
 
-        connection.start().catch(err => console.error(err));
-    </script>
+    connection.start().catch(err => console.error(err));
+</script>
 </body>
 </html>
