@@ -10,7 +10,7 @@
         "projectUniqueName": "/Users/prathamdesai/OmniStat/Dashboard/Dashboard.csproj",
         "projectName": "Dashboard",
         "projectPath": "/Users/prathamdesai/OmniStat/Dashboard/Dashboard.csproj",
-        "packagesPath": "/Users/prathamdesai/.nuget/packages/",
+        "packagesPath": "/var/folders/d9/yj4kmn496j372r46vgxqzkrh0000gn/T/cursor-sandbox-cache/19e84c7f9fede0ad30cb9de5d4526ad3/nuget",
         "outputPath": "/Users/prathamdesai/OmniStat/Dashboard/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
@@ -47,6 +47,10 @@
             "Microsoft.AspNetCore.OpenApi": {
               "target": "Package",
               "version": "[9.0.13, )"
+            },
+            "Newtonsoft.Json": {
+              "target": "Package",
+              "version": "[13.0.4, )"
             },
             "StackExchange.Redis": {
               "target": "Package",

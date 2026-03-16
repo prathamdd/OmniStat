@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  redis:
+    image: redis:latest
+    container_name: sports-redis
+    ports:
+      - "6379:6379"
+
+  dashboard:
+    build: ./Dashboard
+    ports:
+      - "5116:5116"
+    environment:
+      - ASPNETCORE_URLS=http://0.0.0.0:5116
+      - REDIS_HOST=redis  # This tells .NET to look for the redis container
+    depends_on:
+      - redis
+
+  score-ingestor:
+    build: ./Ingestor
+    command: python3 ingestor.py
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    depends_on:
+      - redis
+
+  odds-ingestor:
+    build: ./Ingestor
+    command: python3 odds_ingestor.py
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      # Optional: set this in your shell or .env for safety
+      # - ODDS_API_KEY=your_key_here
+    depends_on:
+      - redis

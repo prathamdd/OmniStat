@@ -14,12 +14,15 @@ builder.Services.AddCors(options => {
 
 // 1. ADD SERVICES (The Ingredients)
 builder.Services.AddSignalR();
+
+// Use "redis" as the host inside Docker; fall back to localhost for bare-metal dev
+var host = Environment.GetEnvironmentVariable("REDIS_HOST") ?? "localhost";
+
+builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>
+    ConnectionMultiplexer.Connect($"{host}:6379"));
+
 // This tells .NET to run your Redis listener in the background
 builder.Services.AddHostedService<RedisSubscriberService>();
-
-// Setup Redis Connection for the /scores route
-var redis = ConnectionMultiplexer.Connect("127.0.0.1:6379");
-builder.Services.AddSingleton<IConnectionMultiplexer>(redis);
 
 var app = builder.Build();
 

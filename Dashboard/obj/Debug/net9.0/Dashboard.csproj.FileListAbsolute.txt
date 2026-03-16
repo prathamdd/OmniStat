@@ -35,3 +35,4 @@
 /Users/prathamdesai/OmniStat/Dashboard/obj/Debug/net9.0/ref/Dashboard.dll
 /Users/prathamdesai/OmniStat/Dashboard/obj/Debug/net9.0/swae.build.ex.cache
 /Users/prathamdesai/OmniStat/Dashboard/obj/Debug/net9.0/Dashboard.sourcelink.json
+/Users/prathamdesai/OmniStat/Dashboard/bin/Debug/net9.0/Newtonsoft.Json.dll

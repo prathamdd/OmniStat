@@ -102,10 +102,7 @@
 </head>
 <body>
     <div id="scoreboard">
-        <div class="live-tag">● LIVE UPDATES ACTIVE</div>
-        <div id="game-title" class="teams">WAITING FOR DATA...</div>
-        <div id="game-score" class="score">00 - 00</div>
-        <div id="game-status" class="status">Initializing SignalR Stream...</div>
+        <div class="live-tag">● OMNISTAT ARBITER INITIALIZING</div>
     </div>
 
 <script>
@@ -114,47 +111,70 @@
         .withAutomaticReconnect()
         .build();
 
-    // Helper to get Logos. NBA logos on this CDN follow a specific naming convention.
+    // Helper to get Logos using a robust mapping from team name to CDN slug.
     const getLogoUrl = (teamName) => {
-        let name = teamName.toLowerCase();
-        // Fix for common naming mismatches
-        if (name === "76ers") name = "philadelphia-76ers";
-        if (name === "trail blazers") name = "portland-trail-blazers";
-        
-        const slug = name.replace(/\s/g, '-');
+        const teamMap = {
+            "MAGIC": "orlando-magic",
+            "HAWKS": "atlanta-hawks",
+            "WARRIORS": "golden-state-warriors",
+            "WIZARDS": "washington-wizards",
+            "SUNS": "phoenix-suns",
+            "CELTICS": "boston-celtics",
+            "GRIZZLIES": "memphis-grizzlies",
+            "BULLS": "chicago-bulls",
+            "NETS": "brooklyn-nets",
+            "TRAIL BLAZERS": "portland-trail-blazers",
+            "MAVERICKS": "dallas-mavericks",
+            "LAKERS": "los-angeles-lakers",
+            "SPURS": "san-antonio-spurs"
+        };
+
+        const slug = teamMap[teamName.toUpperCase()] || teamName.toLowerCase();
         return `https://loodibee.com/wp-content/uploads/nba-${slug}-logo-300x300.png`;
     };
 
     connection.on("ReceiveScore", (message) => {
-        const games = JSON.parse(message);
-        const container = document.getElementById("scoreboard");
+        const payload = JSON.parse(message);
+        const games = payload.LiveScores;
+        const odds = payload.MarketOdds || [];
         
-        // Reset container
-        container.innerHTML = '<div class="live-tag" style="grid-column: 1 / -1;">● LIVE UPDATES ACTIVE</div>';
+        const container = document.getElementById("scoreboard");
+        container.innerHTML = '<div class="live-tag">● OMNISTAT ARBITER ACTIVE</div>';
 
         games.forEach(game => {
-            // Split the score string (e.g., "110 - 105") to compare who is winning
-            const scores = game.score.split(' - ').map(Number);
-            const awayWinning = scores[0] > scores[1];
-            const homeWinning = scores[1] > scores[0];
+            // 1. Find matching odds for this game
+            const gameOdds = odds.find(o => 
+                o.home_team.toUpperCase().includes(game.home.toUpperCase()) || 
+                o.away_team.toUpperCase().includes(game.away.toUpperCase())
+            );
+
+            // 2. Extract the Spread (e.g., -5.5)
+            const spread = gameOdds?.bookmakers?.[0]?.markets
+                ?.find(m => m.key === 'spreads')?.outcomes
+                ?.find(out => out.name.toUpperCase().includes(game.home.toUpperCase()))?.point || 0;
+
+            // 3. Simple Arb Logic: Is the underdog winning?
+            const scores = game.score.split(' - ').map(Number); // [Away, Home]
+            const isUnderdogWinning = (spread > 0 && scores[1] > scores[0]) || (spread < 0 && scores[0] > scores[1]);
+            
+            // 4. Calculate "Arb Glow" - If the point gap is > 5 from the spread
+            const arbAlert = isUnderdogWinning && Math.abs(scores[0] - scores[1]) > 5;
 
             const gameHtml = `
-                <div class="game-card">
+                <div class="game-card" style="${arbAlert ? 'border: 2px solid #00ff88; box-shadow: 0 0 20px rgba(0,255,136,0.4);' : ''}">
                     <div class="team-row">
                         <img src="${getLogoUrl(game.away)}" class="logo" onerror="this.src='https://via.placeholder.com/50?text=NBA'">
-                        <span class="team-name" style="color: ${awayWinning ? '#00ff88' : 'white'}">${game.away}</span>
+                        <span class="team-name">${game.away}</span>
                     </div>
-                    
                     <div class="score-display">${game.score}</div>
-                    
                     <div class="team-row">
                         <img src="${getLogoUrl(game.home)}" class="logo" onerror="this.src='https://via.placeholder.com/50?text=NBA'">
-                        <span class="team-name" style="color: ${homeWinning ? '#00ff88' : 'white'}">${game.home}</span>
+                        <span class="team-name">${game.home}</span>
                     </div>
-                    
-                    <div class="status-bar" style="margin-top: 15px; font-size: 0.8rem; color: #888;">
-                        ${game.status} • <span style="font-family: monospace;">${game.last_update}</span>
+                    <div class="status-bar">
+                        ${spread !== 0 ? `LINE: ${spread > 0 ? '+' : ''}${spread}` : 'NO LINE'} | ${game.status}
                     </div>
+                    ${arbAlert ? '<div style="color: #00ff88; font-size: 0.7rem; font-weight: bold; margin-top: 5px;">⚠️ HIGH VALUE OPPORTUNITY</div>' : ''}
                 </div>
             `;
             container.insertAdjacentHTML('beforeend', gameHtml);

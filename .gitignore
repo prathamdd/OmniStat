@@ -1,4 +1,14 @@
-.venv/
+# .NET
+bin/
+obj/
+*.user
+*.suo
+
+# Python
 __pycache__/
 *.pyc
+.env
+venv/
+
+# OS
 .DS_Store
