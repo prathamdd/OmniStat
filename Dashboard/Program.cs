@@ -14,6 +14,7 @@ builder.Services.AddCors(options => {
 
 // 1. ADD SERVICES (The Ingredients)
 builder.Services.AddSignalR();
+builder.Services.AddControllers();
 
 // Use "redis" as the host inside Docker; fall back to localhost for bare-metal dev
 var host = Environment.GetEnvironmentVariable("REDIS_HOST") ?? "localhost";
@@ -47,6 +48,7 @@ app.MapGet("/scores", async (IConnectionMultiplexer redisConn) => {
 app.UseCors();
 // New Hotness: SignalR Hub address
 app.MapHub<ScoreHub>("/scoreHub");
+app.MapControllers();
 
 // Health Check
 app.MapGet("/ping", () => new { status = "SignalR and Background Service are live!" });

@@ -105,41 +105,127 @@
         <div class="live-tag">● OMNISTAT ARBITER INITIALIZING</div>
     </div>
 
+    <div id="history-panel" style="margin-top: 50px; width: 90%; max-width: 1300px; background: #1a1a1a; padding: 20px; border-radius: 15px; border: 1px solid #333;">
+        <h3 style="color: #00ff88; margin-top: 0;">🏆 HISTORICAL VALUE ALERTS</h3>
+        <table id="history-table" style="width: 100%; color: #aaa; text-align: left; border-collapse: collapse;">
+            <thead>
+                <tr style="border-bottom: 1px solid #333;">
+                    <th style="padding: 10px;">TIME</th>
+                    <th>MATCHUP</th>
+                    <th>VALUE</th>
+                </tr>
+            </thead>
+            <tbody id="history-body">
+            </tbody>
+        </table>
+    </div>
+
 <script>
     const connection = new signalR.HubConnectionBuilder()
         .withUrl("http://localhost:5116/scoreHub")
         .withAutomaticReconnect()
         .build();
 
+    const API_BASE = "http://localhost:5116";
+
     // Helper to get Logos using a robust mapping from team name to CDN slug.
     const getLogoUrl = (teamName) => {
         const teamMap = {
-            "MAGIC": "orlando-magic",
-            "HAWKS": "atlanta-hawks",
-            "WARRIORS": "golden-state-warriors",
-            "WIZARDS": "washington-wizards",
-            "SUNS": "phoenix-suns",
-            "CELTICS": "boston-celtics",
-            "GRIZZLIES": "memphis-grizzlies",
+            "76ERS": "philadelphia-76ers",
+            "SIXERS": "philadelphia-76ers",
+            "BUCKS": "milwaukee-bucks",
             "BULLS": "chicago-bulls",
-            "NETS": "brooklyn-nets",
-            "TRAIL BLAZERS": "portland-trail-blazers",
-            "MAVERICKS": "dallas-mavericks",
+            "CAVALIERS": "cleveland-cavaliers",
+            "CELTICS": "boston-celtics",
+            "CLIPPERS": "los-angeles-clippers",
+            "GRIZZLIES": "memphis-grizzlies",
+            "HAWKS": "atlanta-hawks",
+            "HEAT": "miami-heat",
+            "HORNETS": "charlotte-hornets",
+            "JAZZ": "utah-jazz",
+            "KINGS": "sacramento-kings",
+            "KNICKS": "new-york-knicks",
             "LAKERS": "los-angeles-lakers",
-            "SPURS": "san-antonio-spurs"
+            "MAGIC": "orlando-magic",
+            "MAVERICKS": "dallas-mavericks",
+            "NETS": "brooklyn-nets",
+            "NUGGETS": "denver-nuggets",
+            "PACERS": "indiana-pacers",
+            "PELICANS": "new-orleans-pelicans",
+            "PISTONS": "detroit-pistons",
+            "RAPTORS": "toronto-raptors",
+            "ROCKETS": "houston-rockets",
+            "SPURS": "san-antonio-spurs",
+            "SUNS": "phoenix-suns",
+            "THUNDER": "oklahoma-city-thunder",
+            "TIMBERWOLVES": "minnesota-timberwolves",
+            "TRAIL BLAZERS": "portland-trail-blazers",
+            "BLAZERS": "portland-trail-blazers",
+            "WARRIORS": "golden-state-warriors",
+            "WIZARDS": "washington-wizards"
         };
 
-        const slug = teamMap[teamName.toUpperCase()] || teamName.toLowerCase();
+        const slug = teamMap[teamName.toUpperCase().trim()] || teamName.toLowerCase().trim();
         return `https://loodibee.com/wp-content/uploads/nba-${slug}-logo-300x300.png`;
     };
+
+    async function loadHistory() {
+        try {
+            const response = await fetch(`${API_BASE}/api/history`);
+            const data = await response.json();
+            const tbody = document.getElementById("history-body");
+            if (!tbody) return;
+
+            tbody.innerHTML = "";
+
+            data.forEach(item => {
+                const row = `
+                    <tr style="border-bottom: 1px solid #222;">
+                        <td style="padding: 10px; color: #00ff88;">${item?.Time ?? ""}</td>
+                        <td>${item?.Game ?? ""}</td>
+                        <td style="font-weight: bold; color: white;">${item?.Value ?? ""}</td>
+                    </tr>`;
+                tbody.insertAdjacentHTML('beforeend', row);
+            });
+        } catch (err) {
+            console.error("Failed to load history:", err);
+        }
+    }
+
+    // Call it when the page loads
+    loadHistory();
 
     connection.on("ReceiveScore", (message) => {
         const payload = JSON.parse(message);
         const games = payload.LiveScores;
         const odds = payload.MarketOdds || [];
+        const history = payload.History || [];
         
         const container = document.getElementById("scoreboard");
         container.innerHTML = '<div class="live-tag">● OMNISTAT ARBITER ACTIVE</div>';
+
+        // Every time we get a score update, refresh the history table
+        const fetchHistory = async () => {
+            const body = document.getElementById("history-body");
+            if (!body) return;
+            body.innerHTML = "";
+
+            history.forEach(item => {
+                const time = item?.Time || "";
+                const game = item?.Game || "";
+                const value = item?.Value || "";
+                body.insertAdjacentHTML(
+                    "beforeend",
+                    `<tr style="border-bottom: 1px solid #2a2a2a;">
+                        <td style="padding: 10px; font-family: monospace;">${time}</td>
+                        <td>${game}</td>
+                        <td style="color: #00ff88; font-weight: 700;">${value}</td>
+                    </tr>`
+                );
+            });
+        };
+
+        fetchHistory();
 
         games.forEach(game => {
             // 1. Find matching odds for this game
@@ -148,17 +234,38 @@
                 o.away_team.toUpperCase().includes(game.away.toUpperCase())
             );
 
-            // 2. Extract the Spread (e.g., -5.5)
-            const spread = gameOdds?.bookmakers?.[0]?.markets
+            // 2. Extract the Home Spread (e.g., -5.5)
+            const homeSpread = gameOdds?.bookmakers?.[0]?.markets
                 ?.find(m => m.key === 'spreads')?.outcomes
                 ?.find(out => out.name.toUpperCase().includes(game.home.toUpperCase()))?.point || 0;
 
             // 3. Simple Arb Logic: Is the underdog winning?
             const scores = game.score.split(' - ').map(Number); // [Away, Home]
-            const isUnderdogWinning = (spread > 0 && scores[1] > scores[0]) || (spread < 0 && scores[0] > scores[1]);
+            const isUnderdogWinning = (homeSpread > 0 && scores[1] > scores[0]) || (homeSpread < 0 && scores[0] > scores[1]);
             
             // 4. Calculate "Arb Glow" - If the point gap is > 5 from the spread
             const arbAlert = isUnderdogWinning && Math.abs(scores[0] - scores[1]) > 5;
+
+            // 5. Make the line more explicit: who is favorite/underdog?
+            let lineLabel = "NO LINE";
+            if (homeSpread !== 0) {
+                const favTeam = homeSpread < 0 ? game.home : game.away;
+                const favSpread = homeSpread < 0 ? homeSpread : -homeSpread; // show negative for favorite
+                const underTeam = homeSpread < 0 ? game.away : game.home;
+                const underSpread = -favSpread;
+
+                const badgeStyleFav = "display:inline-block;padding:2px 8px;border-radius:999px;background:#00ff88;color:#0f0f0f;font-weight:800;letter-spacing:0.6px;font-size:0.72rem;";
+                const badgeStyleUnd = "display:inline-block;padding:2px 8px;border-radius:999px;background:#333;color:#ddd;font-weight:800;letter-spacing:0.6px;font-size:0.72rem;margin-left:8px;";
+
+                lineLabel = `
+                    <span style="${badgeStyleFav}">FAV</span>
+                    <span style="margin-left:8px;color:#fff;font-weight:800;">${favTeam}</span>
+                    <span style="margin-left:6px;font-family:monospace;color:#ddd;">${favSpread > 0 ? '+' : ''}${favSpread}</span>
+                    <span style="${badgeStyleUnd}">UND</span>
+                    <span style="margin-left:8px;color:#fff;font-weight:700;">${underTeam}</span>
+                    <span style="margin-left:6px;font-family:monospace;color:#aaa;">${underSpread > 0 ? '+' : ''}${underSpread}</span>
+                `;
+            }
 
             const gameHtml = `
                 <div class="game-card" style="${arbAlert ? 'border: 2px solid #00ff88; box-shadow: 0 0 20px rgba(0,255,136,0.4);' : ''}">
@@ -172,7 +279,8 @@
                         <span class="team-name">${game.home}</span>
                     </div>
                     <div class="status-bar">
-                        ${spread !== 0 ? `LINE: ${spread > 0 ? '+' : ''}${spread}` : 'NO LINE'} | ${game.status}
+                        <span style="display:block;color:#bbb;margin-bottom:6px;">${game.status}</span>
+                        <span style="display:block;">${lineLabel}</span>
                     </div>
                     ${arbAlert ? '<div style="color: #00ff88; font-size: 0.7rem; font-weight: bold; margin-top: 5px;">⚠️ HIGH VALUE OPPORTUNITY</div>' : ''}
                 </div>
