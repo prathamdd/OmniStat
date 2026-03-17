@@ -425,7 +425,7 @@
     ]
   },
   "packageFolders": {
-    "/var/folders/d9/yj4kmn496j372r46vgxqzkrh0000gn/T/cursor-sandbox-cache/19e84c7f9fede0ad30cb9de5d4526ad3/nuget": {}
+    "/var/folders/d9/yj4kmn496j372r46vgxqzkrh0000gn/T/cursor-sandbox-cache/fb0e33343baef6ee2fd3e88b45b51d8e/nuget": {}
   },
   "project": {
     "version": "1.0.0",
@@ -433,7 +433,7 @@
       "projectUniqueName": "/Users/prathamdesai/OmniStat/Dashboard/Dashboard.csproj",
       "projectName": "Dashboard",
       "projectPath": "/Users/prathamdesai/OmniStat/Dashboard/Dashboard.csproj",
-      "packagesPath": "/var/folders/d9/yj4kmn496j372r46vgxqzkrh0000gn/T/cursor-sandbox-cache/19e84c7f9fede0ad30cb9de5d4526ad3/nuget",
+      "packagesPath": "/var/folders/d9/yj4kmn496j372r46vgxqzkrh0000gn/T/cursor-sandbox-cache/fb0e33343baef6ee2fd3e88b45b51d8e/nuget",
       "outputPath": "/Users/prathamdesai/OmniStat/Dashboard/obj/",
       "projectStyle": "PackageReference",
       "configFilePaths": [
@@ -502,5 +502,13 @@
         "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/10.0.103/PortableRuntimeIdentifierGraph.json"
       }
     }
-  }
+  },
+  "logs": [
+    {
+      "code": "NU1900",
+      "level": "Warning",
+      "warningLevel": 1,
+      "message": "Error occurred while getting package vulnerability data: Access to the path '/Users/prathamdesai/.local/share/NuGet/http-cache/670c1461c29885f9aa22c281d8b7da90845b38e4$ps:_api.nuget.org_v3_index.json/vuln_index.dat-new' is denied."
+    }
+  ]
 }
