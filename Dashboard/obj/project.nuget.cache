@@ -1,28 +1,18 @@
 {
   "version": 2,
-  "dgSpecHash": "ciFVJa3AeIs=",
+  "dgSpecHash": "Giql1ZWxusc=",
   "success": true,
   "projectFilePath": "/Users/prathamdesai/OmniStat/Dashboard/Dashboard.csproj",
   "expectedPackageFiles": [
-    "/var/folders/d9/yj4kmn496j372r46vgxqzkrh0000gn/T/cursor-sandbox-cache/fb0e33343baef6ee2fd3e88b45b51d8e/nuget/microsoft.aspnetcore.openapi/9.0.13/microsoft.aspnetcore.openapi.9.0.13.nupkg.sha512",
-    "/var/folders/d9/yj4kmn496j372r46vgxqzkrh0000gn/T/cursor-sandbox-cache/fb0e33343baef6ee2fd3e88b45b51d8e/nuget/microsoft.extensions.dependencyinjection.abstractions/8.0.0/microsoft.extensions.dependencyinjection.abstractions.8.0.0.nupkg.sha512",
-    "/var/folders/d9/yj4kmn496j372r46vgxqzkrh0000gn/T/cursor-sandbox-cache/fb0e33343baef6ee2fd3e88b45b51d8e/nuget/microsoft.extensions.logging.abstractions/8.0.0/microsoft.extensions.logging.abstractions.8.0.0.nupkg.sha512",
-    "/var/folders/d9/yj4kmn496j372r46vgxqzkrh0000gn/T/cursor-sandbox-cache/fb0e33343baef6ee2fd3e88b45b51d8e/nuget/microsoft.openapi/1.6.17/microsoft.openapi.1.6.17.nupkg.sha512",
-    "/var/folders/d9/yj4kmn496j372r46vgxqzkrh0000gn/T/cursor-sandbox-cache/fb0e33343baef6ee2fd3e88b45b51d8e/nuget/newtonsoft.json/13.0.4/newtonsoft.json.13.0.4.nupkg.sha512",
-    "/var/folders/d9/yj4kmn496j372r46vgxqzkrh0000gn/T/cursor-sandbox-cache/fb0e33343baef6ee2fd3e88b45b51d8e/nuget/pipelines.sockets.unofficial/2.2.8/pipelines.sockets.unofficial.2.2.8.nupkg.sha512",
-    "/var/folders/d9/yj4kmn496j372r46vgxqzkrh0000gn/T/cursor-sandbox-cache/fb0e33343baef6ee2fd3e88b45b51d8e/nuget/stackexchange.redis/2.11.8/stackexchange.redis.2.11.8.nupkg.sha512",
-    "/var/folders/d9/yj4kmn496j372r46vgxqzkrh0000gn/T/cursor-sandbox-cache/fb0e33343baef6ee2fd3e88b45b51d8e/nuget/system.io.hashing/10.0.2/system.io.hashing.10.0.2.nupkg.sha512",
-    "/var/folders/d9/yj4kmn496j372r46vgxqzkrh0000gn/T/cursor-sandbox-cache/fb0e33343baef6ee2fd3e88b45b51d8e/nuget/system.io.pipelines/5.0.1/system.io.pipelines.5.0.1.nupkg.sha512"
+    "/Users/prathamdesai/.nuget/packages/microsoft.aspnetcore.openapi/9.0.13/microsoft.aspnetcore.openapi.9.0.13.nupkg.sha512",
+    "/Users/prathamdesai/.nuget/packages/microsoft.extensions.dependencyinjection.abstractions/8.0.0/microsoft.extensions.dependencyinjection.abstractions.8.0.0.nupkg.sha512",
+    "/Users/prathamdesai/.nuget/packages/microsoft.extensions.logging.abstractions/8.0.0/microsoft.extensions.logging.abstractions.8.0.0.nupkg.sha512",
+    "/Users/prathamdesai/.nuget/packages/microsoft.openapi/1.6.17/microsoft.openapi.1.6.17.nupkg.sha512",
+    "/Users/prathamdesai/.nuget/packages/newtonsoft.json/13.0.4/newtonsoft.json.13.0.4.nupkg.sha512",
+    "/Users/prathamdesai/.nuget/packages/pipelines.sockets.unofficial/2.2.8/pipelines.sockets.unofficial.2.2.8.nupkg.sha512",
+    "/Users/prathamdesai/.nuget/packages/stackexchange.redis/2.11.8/stackexchange.redis.2.11.8.nupkg.sha512",
+    "/Users/prathamdesai/.nuget/packages/system.io.hashing/10.0.2/system.io.hashing.10.0.2.nupkg.sha512",
+    "/Users/prathamdesai/.nuget/packages/system.io.pipelines/5.0.1/system.io.pipelines.5.0.1.nupkg.sha512"
   ],
-  "logs": [
-    {
-      "code": "NU1900",
-      "level": "Warning",
-      "message": "Error occurred while getting package vulnerability data: Access to the path '/Users/prathamdesai/.local/share/NuGet/http-cache/670c1461c29885f9aa22c281d8b7da90845b38e4$ps:_api.nuget.org_v3_index.json/vuln_index.dat-new' is denied.",
-      "projectPath": "/Users/prathamdesai/OmniStat/Dashboard/Dashboard.csproj",
-      "warningLevel": 1,
-      "filePath": "/Users/prathamdesai/OmniStat/Dashboard/Dashboard.csproj",
-      "targetGraphs": []
-    }
-  ]
+  "logs": []
 }
