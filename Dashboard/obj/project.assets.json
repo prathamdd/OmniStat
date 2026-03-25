@@ -425,7 +425,7 @@
     ]
   },
   "packageFolders": {
-    "/Users/prathamdesai/.nuget/packages/": {}
+    "/var/folders/d9/yj4kmn496j372r46vgxqzkrh0000gn/T/cursor-sandbox-cache/7b54fdee83ed3df2da3a1cf3f2819119/nuget": {}
   },
   "project": {
     "version": "1.0.0",
@@ -433,7 +433,7 @@
       "projectUniqueName": "/Users/prathamdesai/OmniStat/Dashboard/Dashboard.csproj",
       "projectName": "Dashboard",
       "projectPath": "/Users/prathamdesai/OmniStat/Dashboard/Dashboard.csproj",
-      "packagesPath": "/Users/prathamdesai/.nuget/packages/",
+      "packagesPath": "/var/folders/d9/yj4kmn496j372r46vgxqzkrh0000gn/T/cursor-sandbox-cache/7b54fdee83ed3df2da3a1cf3f2819119/nuget",
       "outputPath": "/Users/prathamdesai/OmniStat/Dashboard/obj/",
       "projectStyle": "PackageReference",
       "configFilePaths": [
@@ -502,5 +502,13 @@
         "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/10.0.103/PortableRuntimeIdentifierGraph.json"
       }
     }
-  }
+  },
+  "logs": [
+    {
+      "code": "NU1900",
+      "level": "Warning",
+      "warningLevel": 1,
+      "message": "Error occurred while getting package vulnerability data: Access to the path '/Users/prathamdesai/.local/share/NuGet/http-cache/670c1461c29885f9aa22c281d8b7da90845b38e4$ps:_api.nuget.org_v3_index.json/vuln_index.dat-new' is denied."
+    }
+  ]
 }

@@ -128,46 +128,68 @@
 
     const API_BASE = "http://localhost:5116";
 
-    // Helper to get Logos using a robust mapping from team name to CDN slug.
-    const getLogoUrl = (teamName) => {
-        const teamMap = {
-            "76ERS": "philadelphia-76ers",
-            "SIXERS": "philadelphia-76ers",
-            "BUCKS": "milwaukee-bucks",
-            "BULLS": "chicago-bulls",
-            "CAVALIERS": "cleveland-cavaliers",
-            "CELTICS": "boston-celtics",
-            "CLIPPERS": "los-angeles-clippers",
-            "GRIZZLIES": "memphis-grizzlies",
-            "HAWKS": "atlanta-hawks",
-            "HEAT": "miami-heat",
-            "HORNETS": "charlotte-hornets",
-            "JAZZ": "utah-jazz",
-            "KINGS": "sacramento-kings",
-            "KNICKS": "new-york-knicks",
-            "LAKERS": "los-angeles-lakers",
-            "MAGIC": "orlando-magic",
-            "MAVERICKS": "dallas-mavericks",
-            "NETS": "brooklyn-nets",
-            "NUGGETS": "denver-nuggets",
-            "PACERS": "indiana-pacers",
-            "PELICANS": "new-orleans-pelicans",
-            "PISTONS": "detroit-pistons",
-            "RAPTORS": "toronto-raptors",
-            "ROCKETS": "houston-rockets",
-            "SPURS": "san-antonio-spurs",
-            "SUNS": "phoenix-suns",
-            "THUNDER": "oklahoma-city-thunder",
-            "TIMBERWOLVES": "minnesota-timberwolves",
-            "TRAIL BLAZERS": "portland-trail-blazers",
-            "BLAZERS": "portland-trail-blazers",
-            "WARRIORS": "golden-state-warriors",
-            "WIZARDS": "washington-wizards"
-        };
-
-        const slug = teamMap[teamName.toUpperCase().trim()] || teamName.toLowerCase().trim();
-        return `https://loodibee.com/wp-content/uploads/nba-${slug}-logo-300x300.png`;
+    // Official NBA CDN team ids (fallback when Loodibee filename differs)
+    const TEAM_NBA_ID = {
+        "HAWKS": "1610612737", "CELTICS": "1610612738", "NETS": "1610612751", "HORNETS": "1610612766",
+        "BULLS": "1610612741", "CAVALIERS": "1610612739", "MAVERICKS": "1610612742", "NUGGETS": "1610612743",
+        "PISTONS": "1610612765", "WARRIORS": "1610612744", "ROCKETS": "1610612745", "PACERS": "1610612754",
+        "CLIPPERS": "1610612746", "LAKERS": "1610612747", "GRIZZLIES": "1610612763", "HEAT": "1610612748",
+        "BUCKS": "1610612749", "TIMBERWOLVES": "1610612750", "PELICANS": "1610612740", "KNICKS": "1610612752",
+        "THUNDER": "1610612760", "MAGIC": "1610612753", "76ERS": "1610612755", "SIXERS": "1610612755",
+        "SUNS": "1610612756", "BLAZERS": "1610612757", "TRAIL BLAZERS": "1610612757", "KINGS": "1610612758",
+        "SPURS": "1610612759", "RAPTORS": "1610612761", "JAZZ": "1610612762", "WIZARDS": "1610612764"
     };
+
+    const LOODIBEE_SLUG = {
+        "76ERS": "philadelphia-76ers", "SIXERS": "philadelphia-76ers", "BUCKS": "milwaukee-bucks",
+        "BULLS": "chicago-bulls", "CAVALIERS": "cleveland-cavaliers", "CELTICS": "boston-celtics",
+        "CLIPPERS": "los-angeles-clippers", "GRIZZLIES": "memphis-grizzlies", "HAWKS": "atlanta-hawks",
+        "HEAT": "miami-heat", "HORNETS": "charlotte-hornets", "JAZZ": "utah-jazz", "KINGS": "sacramento-kings",
+        "KNICKS": "new-york-knicks", "LAKERS": "los-angeles-lakers", "MAGIC": "orlando-magic",
+        "MAVERICKS": "dallas-mavericks", "NETS": "brooklyn-nets", "NUGGETS": "denver-nuggets",
+        "PACERS": "indiana-pacers", "PELICANS": "new-orleans-pelicans", "PISTONS": "detroit-pistons",
+        "RAPTORS": "toronto-raptors", "ROCKETS": "houston-rockets", "SPURS": "san-antonio-spurs",
+        "SUNS": "phoenix-suns", "THUNDER": "oklahoma-city-thunder", "TIMBERWOLVES": "minnesota-timberwolves",
+        "TRAIL BLAZERS": "portland-trail-blazers", "BLAZERS": "portland-trail-blazers",
+        "WARRIORS": "golden-state-warriors", "WIZARDS": "washington-wizards"
+    };
+
+    function resolveTeamKeys(teamName) {
+        const u = teamName.toUpperCase().trim();
+        const parts = u.split(/\s+/).filter(Boolean);
+        const keys = new Set([u]);
+        if (parts.length) keys.add(parts[parts.length - 1]);
+        if (parts.length >= 2) keys.add(parts.slice(-2).join(" "));
+        return [...keys];
+    }
+
+    function resolveNbaTeamId(teamName) {
+        for (const key of resolveTeamKeys(teamName)) {
+            if (TEAM_NBA_ID[key]) return TEAM_NBA_ID[key];
+        }
+        return null;
+    }
+
+    function getLogoUrl(teamName) {
+        for (const key of resolveTeamKeys(teamName)) {
+            if (LOODIBEE_SLUG[key]) {
+                return `https://loodibee.com/wp-content/uploads/nba-${LOODIBEE_SLUG[key]}-logo-300x300.png`;
+            }
+        }
+        const slug = teamName.toLowerCase().trim().replace(/\s+/g, "-");
+        return `https://loodibee.com/wp-content/uploads/nba-${slug}-logo-300x300.png`;
+    }
+
+    function logoImgHtml(teamName) {
+        const primary = getLogoUrl(teamName);
+        const nbaId = resolveNbaTeamId(teamName);
+        const placeholder = "https://via.placeholder.com/50?text=NBA";
+        if (nbaId) {
+            const nbaUrl = `https://cdn.nba.com/logos/nba/${nbaId}/primary/L/logo.svg`;
+            return `<img src="${primary}" class="logo" alt="" onerror="if(!this.dataset.nba){this.dataset.nba=1;this.src='${nbaUrl}';}else{this.onerror=null;this.src='${placeholder}';}">`;
+        }
+        return `<img src="${primary}" class="logo" alt="" onerror="this.onerror=null;this.src='${placeholder}'">`;
+    }
 
     async function loadHistory() {
         try {
@@ -197,12 +219,13 @@
 
     connection.on("ReceiveScore", (message) => {
         const payload = JSON.parse(message);
-        const games = payload.LiveScores;
+        const games = Array.isArray(payload.LiveScores) ? payload.LiveScores : [];
         const odds = payload.MarketOdds || [];
         const history = payload.History || [];
+        const kind = payload.TriggeredBy || "scores";
         
         const container = document.getElementById("scoreboard");
-        container.innerHTML = '<div class="live-tag">● OMNISTAT ARBITER ACTIVE</div>';
+        container.innerHTML = `<div class="live-tag">● OMNISTAT ARBITER ACTIVE <span style="opacity:0.85;font-size:0.85rem;font-weight:600;">— last push: <span style="color:#00ff88;">${kind}</span> @ ${payload.Timestamp || ""}</span></div><div style="grid-column:1/-1;text-align:center;color:#888;font-size:0.75rem;margin-bottom:8px;">Odds refresh on their own schedule (API lines often look static until books move).</div>`;
 
         // Every time we get a score update, refresh the history table
         const fetchHistory = async () => {
@@ -270,12 +293,12 @@
             const gameHtml = `
                 <div class="game-card" style="${arbAlert ? 'border: 2px solid #00ff88; box-shadow: 0 0 20px rgba(0,255,136,0.4);' : ''}">
                     <div class="team-row">
-                        <img src="${getLogoUrl(game.away)}" class="logo" onerror="this.src='https://via.placeholder.com/50?text=NBA'">
+                        ${logoImgHtml(game.away)}
                         <span class="team-name">${game.away}</span>
                     </div>
                     <div class="score-display">${game.score}</div>
                     <div class="team-row">
-                        <img src="${getLogoUrl(game.home)}" class="logo" onerror="this.src='https://via.placeholder.com/50?text=NBA'">
+                        ${logoImgHtml(game.home)}
                         <span class="team-name">${game.home}</span>
                     </div>
                     <div class="status-bar">

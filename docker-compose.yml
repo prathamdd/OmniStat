@@ -32,6 +32,8 @@ services:
     environment:
       - REDIS_HOST=redis
       - REDIS_PORT=6379
+      # More frequent pushes so the UI can show "last push: odds @ …" (uses more Odds API quota)
+      - ODDS_POLL_SECONDS=120
       # Optional: set this in your shell or .env for safety
       # - ODDS_API_KEY=your_key_here
     depends_on:
