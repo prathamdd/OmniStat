@@ -82,19 +82,48 @@ public class RedisSubscriberService : BackgroundService
                 ((o?["away_team"]?.ToString() ?? string.Empty).ToUpperInvariant().Contains(away))
             ) as JObject;
 
-            // Extract the home spread (e.g., -5.5) from spreads market
-            var spreadToken =
-                gameOdds?["bookmakers"]?.FirstOrDefault()?["markets"]?
-                    .FirstOrDefault(m => string.Equals(m?["key"]?.ToString(), "spreads", StringComparison.OrdinalIgnoreCase))?["outcomes"]?
-                    .FirstOrDefault(outcome => (outcome?["name"]?.ToString() ?? string.Empty).ToUpperInvariant().Contains(home))?["point"];
+            // Extract the home spread (e.g., -5.5) from spreads market.
+            // Robust approach:
+            // - prefer the outcome that matches the home team
+            // - if home outcome isn't found, derive it as the negative of the away outcome (common spreads symmetry)
+            var spreadsMarket = gameOdds?["bookmakers"]?.FirstOrDefault()?["markets"]?
+                .FirstOrDefault(m => string.Equals(m?["key"]?.ToString(), "spreads", StringComparison.OrdinalIgnoreCase));
 
-            var spread = spreadToken?.Type switch
+            var outcomes = spreadsMarket?["outcomes"] as JArray;
+
+            static double ParsePoint(JToken? token)
             {
-                JTokenType.Integer => spreadToken.Value<double>(),
-                JTokenType.Float => spreadToken.Value<double>(),
-                JTokenType.String when double.TryParse(spreadToken.Value<string>(), out var s) => s,
-                _ => 0d
-            };
+                if (token == null) return 0d;
+                return token.Type switch
+                {
+                    JTokenType.Integer => token.Value<double>(),
+                    JTokenType.Float => token.Value<double>(),
+                    JTokenType.String when double.TryParse(token.Value<string>(), out var s) => s,
+                    _ => 0d
+                };
+            }
+
+            double spread = 0d;
+            if (outcomes != null && outcomes.Count > 0)
+            {
+                var homeOutcome = outcomes.FirstOrDefault(outcome =>
+                    (outcome?["name"]?.ToString() ?? string.Empty).ToUpperInvariant().Contains(home));
+
+                var awayOutcome = outcomes.FirstOrDefault(outcome =>
+                    (outcome?["name"]?.ToString() ?? string.Empty).ToUpperInvariant().Contains(away));
+
+                var homePoint = ParsePoint(homeOutcome?["point"]);
+                if (homePoint != 0d)
+                {
+                    spread = homePoint;
+                }
+                else
+                {
+                    var awayPoint = ParsePoint(awayOutcome?["point"]);
+                    // If away has +5.5 (away gets points), home is -5.5 (home lays points).
+                    spread = awayPoint != 0d ? -awayPoint : 0d;
+                }
+            }
 
             var scoreDiff = Math.Abs(homeScore - awayScore);
             var isUnderdogWinning =
