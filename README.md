@@ -28,7 +28,7 @@ The system is built as a **containerized microservices architecture** to ensure 
 ---
 
 ## The Philosophy of the Arbiter
-Drawing from **symbolic logic**, the system treats **Expectation** ($E$) and **Reality** ($R$) as two distinct data streams. An **"Arb Alert"** is triggered when the delta $|R - E|$ exceeds a predefined threshold, signaling that the market (the betting line) has failed to account for a sudden shift in the live game state.
+The system treats **Expectation** ($E$) and **Reality** ($R$) as two distinct data streams. An **"Arb Alert"** is triggered when the delta $|R - E|$ exceeds a predefined threshold, signaling that the market (the betting line) has failed to account for a sudden shift in the live game state.
 
 
 
