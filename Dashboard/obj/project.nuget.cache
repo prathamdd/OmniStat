@@ -1,18 +1,18 @@
 {
   "version": 2,
-  "dgSpecHash": "sauY7919O9s=",
+  "dgSpecHash": "OtyD/z7XpCc=",
   "success": true,
   "projectFilePath": "/Users/prathamdesai/OmniStat/Dashboard/Dashboard.csproj",
   "expectedPackageFiles": [
-    "/var/folders/d9/yj4kmn496j372r46vgxqzkrh0000gn/T/cursor-sandbox-cache/7b54fdee83ed3df2da3a1cf3f2819119/nuget/microsoft.aspnetcore.openapi/9.0.13/microsoft.aspnetcore.openapi.9.0.13.nupkg.sha512",
-    "/var/folders/d9/yj4kmn496j372r46vgxqzkrh0000gn/T/cursor-sandbox-cache/7b54fdee83ed3df2da3a1cf3f2819119/nuget/microsoft.extensions.dependencyinjection.abstractions/8.0.0/microsoft.extensions.dependencyinjection.abstractions.8.0.0.nupkg.sha512",
-    "/var/folders/d9/yj4kmn496j372r46vgxqzkrh0000gn/T/cursor-sandbox-cache/7b54fdee83ed3df2da3a1cf3f2819119/nuget/microsoft.extensions.logging.abstractions/8.0.0/microsoft.extensions.logging.abstractions.8.0.0.nupkg.sha512",
-    "/var/folders/d9/yj4kmn496j372r46vgxqzkrh0000gn/T/cursor-sandbox-cache/7b54fdee83ed3df2da3a1cf3f2819119/nuget/microsoft.openapi/1.6.17/microsoft.openapi.1.6.17.nupkg.sha512",
-    "/var/folders/d9/yj4kmn496j372r46vgxqzkrh0000gn/T/cursor-sandbox-cache/7b54fdee83ed3df2da3a1cf3f2819119/nuget/newtonsoft.json/13.0.4/newtonsoft.json.13.0.4.nupkg.sha512",
-    "/var/folders/d9/yj4kmn496j372r46vgxqzkrh0000gn/T/cursor-sandbox-cache/7b54fdee83ed3df2da3a1cf3f2819119/nuget/pipelines.sockets.unofficial/2.2.8/pipelines.sockets.unofficial.2.2.8.nupkg.sha512",
-    "/var/folders/d9/yj4kmn496j372r46vgxqzkrh0000gn/T/cursor-sandbox-cache/7b54fdee83ed3df2da3a1cf3f2819119/nuget/stackexchange.redis/2.11.8/stackexchange.redis.2.11.8.nupkg.sha512",
-    "/var/folders/d9/yj4kmn496j372r46vgxqzkrh0000gn/T/cursor-sandbox-cache/7b54fdee83ed3df2da3a1cf3f2819119/nuget/system.io.hashing/10.0.2/system.io.hashing.10.0.2.nupkg.sha512",
-    "/var/folders/d9/yj4kmn496j372r46vgxqzkrh0000gn/T/cursor-sandbox-cache/7b54fdee83ed3df2da3a1cf3f2819119/nuget/system.io.pipelines/5.0.1/system.io.pipelines.5.0.1.nupkg.sha512"
+    "/var/folders/d9/yj4kmn496j372r46vgxqzkrh0000gn/T/cursor-sandbox-cache/bb587874ceecad04fbfdbfd82b451f2c/nuget/microsoft.aspnetcore.openapi/9.0.13/microsoft.aspnetcore.openapi.9.0.13.nupkg.sha512",
+    "/var/folders/d9/yj4kmn496j372r46vgxqzkrh0000gn/T/cursor-sandbox-cache/bb587874ceecad04fbfdbfd82b451f2c/nuget/microsoft.extensions.dependencyinjection.abstractions/8.0.0/microsoft.extensions.dependencyinjection.abstractions.8.0.0.nupkg.sha512",
+    "/var/folders/d9/yj4kmn496j372r46vgxqzkrh0000gn/T/cursor-sandbox-cache/bb587874ceecad04fbfdbfd82b451f2c/nuget/microsoft.extensions.logging.abstractions/8.0.0/microsoft.extensions.logging.abstractions.8.0.0.nupkg.sha512",
+    "/var/folders/d9/yj4kmn496j372r46vgxqzkrh0000gn/T/cursor-sandbox-cache/bb587874ceecad04fbfdbfd82b451f2c/nuget/microsoft.openapi/1.6.17/microsoft.openapi.1.6.17.nupkg.sha512",
+    "/var/folders/d9/yj4kmn496j372r46vgxqzkrh0000gn/T/cursor-sandbox-cache/bb587874ceecad04fbfdbfd82b451f2c/nuget/newtonsoft.json/13.0.4/newtonsoft.json.13.0.4.nupkg.sha512",
+    "/var/folders/d9/yj4kmn496j372r46vgxqzkrh0000gn/T/cursor-sandbox-cache/bb587874ceecad04fbfdbfd82b451f2c/nuget/pipelines.sockets.unofficial/2.2.8/pipelines.sockets.unofficial.2.2.8.nupkg.sha512",
+    "/var/folders/d9/yj4kmn496j372r46vgxqzkrh0000gn/T/cursor-sandbox-cache/bb587874ceecad04fbfdbfd82b451f2c/nuget/stackexchange.redis/2.11.8/stackexchange.redis.2.11.8.nupkg.sha512",
+    "/var/folders/d9/yj4kmn496j372r46vgxqzkrh0000gn/T/cursor-sandbox-cache/bb587874ceecad04fbfdbfd82b451f2c/nuget/system.io.hashing/10.0.2/system.io.hashing.10.0.2.nupkg.sha512",
+    "/var/folders/d9/yj4kmn496j372r46vgxqzkrh0000gn/T/cursor-sandbox-cache/bb587874ceecad04fbfdbfd82b451f2c/nuget/system.io.pipelines/5.0.1/system.io.pipelines.5.0.1.nupkg.sha512"
   ],
   "logs": [
     {
