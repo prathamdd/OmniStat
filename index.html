@@ -200,6 +200,18 @@
 
             tbody.innerHTML = "";
 
+            if (!Array.isArray(data) || data.length === 0) {
+                tbody.insertAdjacentHTML(
+                    "beforeend",
+                    `<tr>
+                        <td colspan="3" style="padding: 12px; color: #666; text-align:center;">
+                            Waiting for HIGH VALUE alerts (underdog winning by margin vs the spread).
+                        </td>
+                    </tr>`
+                );
+                return;
+            }
+
             data.forEach(item => {
                 const row = `
                     <tr style="border-bottom: 1px solid #222;">
@@ -232,6 +244,18 @@
             const body = document.getElementById("history-body");
             if (!body) return;
             body.innerHTML = "";
+
+            if (!Array.isArray(history) || history.length === 0) {
+                body.insertAdjacentHTML(
+                    "beforeend",
+                    `<tr>
+                        <td colspan="3" style="padding: 12px; color: #666; text-align:center;">
+                            Waiting for HIGH VALUE alerts (underdog winning by margin vs the spread).
+                        </td>
+                    </tr>`
+                );
+                return;
+            }
 
             history.forEach(item => {
                 const time = item?.Time || "";
@@ -269,7 +293,21 @@
             // 4. Calculate "Arb Glow" - If the point gap is > 5 from the spread
             const arbAlert = isUnderdogWinning && Math.abs(scores[0] - scores[1]) > 5;
 
-            // 5. Make the line more explicit: who is favorite/underdog?
+            // 5. Probabilistic core: win probability from current margin vs spread-implied margin.
+            // This is intentionally simple & transparent (great for a “next level” demo).
+            const homeScore = scores[1];
+            const awayScore = scores[0];
+            const marginHome = homeScore - awayScore; // positive => home leads
+            const expectedMarginHome = -homeSpread;   // favorite (negative spread) => positive expected margin
+            const k = 10; // higher = less aggressive probabilities
+            const z = (marginHome - expectedMarginHome) / k;
+            const pHome = 1 / (1 + Math.exp(-z));
+            const pAway = 1 - pHome;
+            const pHomePct = Math.max(0, Math.min(100, Math.round(pHome * 100)));
+            const pAwayPct = 100 - pHomePct;
+            const probLabel = `MODEL P(WIN): ${game.home} ${pHomePct}% | ${game.away} ${pAwayPct}%`;
+
+            // 6. Make the line more explicit: who is favorite/underdog?
             let lineLabel = "NO LINE";
             if (homeSpread !== 0) {
                 const favTeam = homeSpread < 0 ? game.home : game.away;
@@ -304,6 +342,7 @@
                     <div class="status-bar">
                         <span style="display:block;color:#bbb;margin-bottom:6px;">${game.status}</span>
                         <span style="display:block;">${lineLabel}</span>
+                        <span style="display:block;margin-top:6px;color:#ddd;font-weight:800;font-size:0.85rem;">${probLabel}</span>
                     </div>
                     ${arbAlert ? '<div style="color: #00ff88; font-size: 0.7rem; font-weight: bold; margin-top: 5px;">⚠️ HIGH VALUE OPPORTUNITY</div>' : ''}
                 </div>

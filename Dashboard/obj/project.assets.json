@@ -425,7 +425,7 @@
     ]
   },
   "packageFolders": {
-    "/var/folders/d9/yj4kmn496j372r46vgxqzkrh0000gn/T/cursor-sandbox-cache/7b54fdee83ed3df2da3a1cf3f2819119/nuget": {}
+    "/var/folders/d9/yj4kmn496j372r46vgxqzkrh0000gn/T/cursor-sandbox-cache/bb587874ceecad04fbfdbfd82b451f2c/nuget": {}
   },
   "project": {
     "version": "1.0.0",
@@ -433,7 +433,7 @@
       "projectUniqueName": "/Users/prathamdesai/OmniStat/Dashboard/Dashboard.csproj",
       "projectName": "Dashboard",
       "projectPath": "/Users/prathamdesai/OmniStat/Dashboard/Dashboard.csproj",
-      "packagesPath": "/var/folders/d9/yj4kmn496j372r46vgxqzkrh0000gn/T/cursor-sandbox-cache/7b54fdee83ed3df2da3a1cf3f2819119/nuget",
+      "packagesPath": "/var/folders/d9/yj4kmn496j372r46vgxqzkrh0000gn/T/cursor-sandbox-cache/bb587874ceecad04fbfdbfd82b451f2c/nuget",
       "outputPath": "/Users/prathamdesai/OmniStat/Dashboard/obj/",
       "projectStyle": "PackageReference",
       "configFilePaths": [
