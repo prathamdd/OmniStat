@@ -205,7 +205,7 @@
                     "beforeend",
                     `<tr>
                         <td colspan="3" style="padding: 12px; color: #666; text-align:center;">
-                            Waiting for HIGH VALUE alerts (underdog winning by margin vs the spread).
+                            Waiting for rare feats (50+ PTS, 20+ REB, 15+ AST).
                         </td>
                     </tr>`
                 );
@@ -213,11 +213,23 @@
             }
 
             data.forEach(item => {
+                const valueText = item?.Value ?? "";
+                const type = (item?.Type || (valueText.includes("PTS") ? "PTS" : valueText.includes("REB") ? "REB" : valueText.includes("AST") ? "AST" : "VALUE")).toUpperCase();
+                const badgeColor = type === "PTS"
+                    ? "#ff5e5e"
+                    : type === "REB"
+                        ? "#4ea8ff"
+                        : type === "AST"
+                            ? "#b57bff"
+                            : "#00ff88";
                 const row = `
                     <tr style="border-bottom: 1px solid #222;">
                         <td style="padding: 10px; color: #00ff88;">${item?.Time ?? ""}</td>
                         <td>${item?.Game ?? ""}</td>
-                        <td style="font-weight: bold; color: white;">${item?.Value ?? ""}</td>
+                        <td style="font-weight: bold; color: white;">
+                            <span style="display:inline-block;padding:2px 8px;border-radius:999px;background:${badgeColor};color:#0f0f0f;font-weight:900;font-size:0.72rem;letter-spacing:0.5px;margin-right:8px;">${type}</span>
+                            ${valueText}
+                        </td>
                     </tr>`;
                 tbody.insertAdjacentHTML('beforeend', row);
             });
@@ -250,7 +262,7 @@
                     "beforeend",
                     `<tr>
                         <td colspan="3" style="padding: 12px; color: #666; text-align:center;">
-                            Waiting for HIGH VALUE alerts (underdog winning by margin vs the spread).
+                            Waiting for rare feats (50+ PTS, 20+ REB, 15+ AST).
                         </td>
                     </tr>`
                 );
@@ -261,12 +273,23 @@
                 const time = item?.Time || "";
                 const game = item?.Game || "";
                 const value = item?.Value || "";
+                const type = (item?.Type || (value.includes("PTS") ? "PTS" : value.includes("REB") ? "REB" : value.includes("AST") ? "AST" : "VALUE")).toUpperCase();
+                const badgeColor = type === "PTS"
+                    ? "#ff5e5e"
+                    : type === "REB"
+                        ? "#4ea8ff"
+                        : type === "AST"
+                            ? "#b57bff"
+                            : "#00ff88";
                 body.insertAdjacentHTML(
                     "beforeend",
                     `<tr style="border-bottom: 1px solid #2a2a2a;">
                         <td style="padding: 10px; font-family: monospace;">${time}</td>
                         <td>${game}</td>
-                        <td style="color: #00ff88; font-weight: 700;">${value}</td>
+                        <td style="color: #00ff88; font-weight: 700;">
+                            <span style="display:inline-block;padding:2px 8px;border-radius:999px;background:${badgeColor};color:#0f0f0f;font-weight:900;font-size:0.72rem;letter-spacing:0.5px;margin-right:8px;">${type}</span>
+                            ${value}
+                        </td>
                     </tr>`
                 );
             });

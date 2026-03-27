@@ -144,6 +144,59 @@ public class RedisSubscriberService : BackgroundService
                 await db.ListLeftPushAsync("arb_history", JsonConvert.SerializeObject(historyItem));
                 await db.ListTrimAsync("arb_history", 0, 9);
             }
+
+            // Rare player feat tracking for Historical Value panel.
+            // We record these once per game/player/category:
+            // - 50+ points
+            // - 20+ rebounds
+            // - 15+ assists
+            if (pushArbHistory)
+            {
+                var gameId = gameToken?["game_id"]?.ToString() ?? "unknown";
+                var leaders = gameToken?["leaders"] as JArray;
+                if (leaders != null)
+                {
+                    foreach (var leader in leaders)
+                    {
+                        var playerName = leader?["name"]?.ToString() ?? string.Empty;
+                        var playerTeam = leader?["team"]?.ToString() ?? string.Empty;
+                        var points = leader?["points"]?.Value<int>() ?? 0;
+                        var rebounds = leader?["rebounds"]?.Value<int>() ?? 0;
+                        var assists = leader?["assists"]?.Value<int>() ?? 0;
+
+                        async Task SaveRareFeatAsync(string featType, int statValue, int threshold, string label)
+                        {
+                            if (string.IsNullOrWhiteSpace(playerName) || statValue < threshold)
+                                return;
+
+                            var dedupeKey = $"rare_feat:{gameId}:{playerName}:{featType}";
+                            var isNew = await db.StringSetAsync(
+                                dedupeKey,
+                                "1",
+                                expiry: TimeSpan.FromHours(24),
+                                when: When.NotExists
+                            );
+
+                            if (!isNew) return;
+
+                            var featHistoryItem = new
+                            {
+                                Game = $"{playerName} ({playerTeam}) | {away} vs {home}",
+                                Value = $"{statValue} {label}",
+                                Type = label,
+                                Time = DateTime.Now.ToString("HH:mm:ss")
+                            };
+
+                            await db.ListLeftPushAsync("arb_history", JsonConvert.SerializeObject(featHistoryItem));
+                            await db.ListTrimAsync("arb_history", 0, 9);
+                        }
+
+                        await SaveRareFeatAsync("pts50", points, 50, "PTS");
+                        await SaveRareFeatAsync("reb20", rebounds, 20, "REB");
+                        await SaveRareFeatAsync("ast15", assists, 15, "AST");
+                    }
+                }
+            }
         }
 
         var historyRaw = await db.ListRangeAsync("arb_history", 0, 9);
