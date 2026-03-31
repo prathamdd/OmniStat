@@ -85,7 +85,7 @@ Set `ODDS_API_KEY` for the odds service (e.g. in `docker-compose.yml` under `odd
 ## Features (current behavior)
 
 - **Live scoreboard** with team logos (Loodibee + NBA CDN fallback) and spread / FAV vs UND display.
-- **Model win probability** on each card (logistic-style adjustment from score margin vs spread-implied margin — demo-oriented, not a production sportsbook model).
+- **Model win probability** on each card: **logistic prior from the home spread** (negative spread = home favored, so pregame leans that way) plus a **live margin** term — demo-oriented, not a production sportsbook model.
 - **Historical Value** (`arb_history`): logs rare **player** lines when leader stats cross thresholds (**50+ PTS**, **20+ REB**, **15+ AST**), with Redis de-duplication per game/player/stat. Older “HIGH” line-edge rows may still appear if present in the list.
 - **TriggeredBy** in the payload so you can see whether the last push was driven by scores or odds.
 

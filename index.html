@@ -316,19 +316,29 @@
             // 4. Calculate "Arb Glow" - If the point gap is > 5 from the spread
             const arbAlert = isUnderdogWinning && Math.abs(scores[0] - scores[1]) > 5;
 
-            // 5. Probabilistic core: win probability from current margin vs spread-implied margin.
-            // This is intentionally simple & transparent (great for a “next level” demo).
+            // 5. Win probability (transparent heuristic, not a sportsbook model):
+            // - Spread convention: homeSpread < 0 => home is favorite (lays points).
+            // - Prior: logit(P_home) shifts with the line so favorites start >50% before tip.
+            // - Live: add a margin term so the probability moves as the score changes.
             const homeScore = scores[1];
             const awayScore = scores[0];
-            const marginHome = homeScore - awayScore; // positive => home leads
-            const expectedMarginHome = -homeSpread;   // favorite (negative spread) => positive expected margin
-            const k = 10; // higher = less aggressive probabilities
-            const z = (marginHome - expectedMarginHome) / k;
-            const pHome = 1 / (1 + Math.exp(-z));
+            const marginHome = homeScore - awayScore; // home - away
+            const sigmoid = (x) => 1 / (1 + Math.exp(-x));
+            const clampProb = (p) => Math.max(0.03, Math.min(0.97, p));
+            const LINE_K = 0.055;   // softer line → avoids wild pregame % (tune: ~0.04–0.07)
+            const MARGIN_K = 0.065; // how fast score moves the needle (per point of margin)
+            let logit;
+            if (homeSpread === 0) {
+                logit = MARGIN_K * marginHome; // no line: drift from 50/50 with score only
+            } else {
+                // Correct sign: favorite (negative homeSpread) => positive logit contribution
+                logit = -LINE_K * homeSpread + MARGIN_K * marginHome;
+            }
+            const pHome = clampProb(sigmoid(logit));
             const pAway = 1 - pHome;
-            const pHomePct = Math.max(0, Math.min(100, Math.round(pHome * 100)));
+            const pHomePct = Math.round(pHome * 100);
             const pAwayPct = 100 - pHomePct;
-            const probLabel = `MODEL P(WIN): ${game.home} ${pHomePct}% | ${game.away} ${pAwayPct}%`;
+            const probLabel = `MODEL P(WIN): ${game.home} ${pHomePct}% | ${game.away} ${pAwayPct}% <span style="color:#666;font-weight:600;font-size:0.72rem;">(line prior + margin)</span>`;
 
             // 6. Make the line more explicit: who is favorite/underdog?
             let lineLabel = "NO LINE";
