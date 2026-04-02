@@ -5,7 +5,7 @@
     <title>OmniStat Live Dashboard</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/6.0.1/signalr.min.js"></script>
 <style>
-    /* Reset and Layout */
+
     body { 
         background: #0f0f0f; 
         color: white; 
@@ -18,7 +18,6 @@
         min-height: 100vh;
     }
 
-    /* The Container: Now a flexible grid */
     #scoreboard { 
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
@@ -28,7 +27,6 @@
         margin-top: 20px;
     }
 
-    /* Individual Game Cards */
     .game-card { 
         background: #1a1a1a; 
         padding: 25px; 
@@ -44,7 +42,6 @@
         border-color: #00ff88;
     }
 
-    /* Team Layout */
     .team-row {
         display: flex;
         align-items: center;
@@ -65,7 +62,7 @@
         letter-spacing: 0.5px;
     }
 
-    /* Score Styling */
+
     .score-display { 
         font-size: 2.8rem; 
         font-weight: 900; 
@@ -77,7 +74,6 @@
         font-family: 'Courier New', monospace;
     }
 
-    /* Meta Info */
     .status-bar { 
         color: #aaa; 
         text-transform: uppercase; 
@@ -128,7 +124,6 @@
 
     const API_BASE = "http://localhost:5116";
 
-    // Official NBA CDN team ids (fallback when Loodibee filename differs)
     const TEAM_NBA_ID = {
         "HAWKS": "1610612737", "CELTICS": "1610612738", "NETS": "1610612751", "HORNETS": "1610612766",
         "BULLS": "1610612741", "CAVALIERS": "1610612739", "MAVERICKS": "1610612742", "NUGGETS": "1610612743",
@@ -304,16 +299,15 @@
                 o.away_team.toUpperCase().includes(game.away.toUpperCase())
             );
 
-            // 2. Extract the Home Spread (e.g., -5.5)
+            // 2. Extract the Home Spread
             const homeSpread = gameOdds?.bookmakers?.[0]?.markets
                 ?.find(m => m.key === 'spreads')?.outcomes
                 ?.find(out => out.name.toUpperCase().includes(game.home.toUpperCase()))?.point || 0;
 
-            // 3. Simple Arb Logic: Is the underdog winning?
+            // 3. Is the underdog winning?
             const scores = game.score.split(' - ').map(Number); // [Away, Home]
             const isUnderdogWinning = (homeSpread > 0 && scores[1] > scores[0]) || (homeSpread < 0 && scores[0] > scores[1]);
             
-            // 4. Calculate "Arb Glow" - If the point gap is > 5 from the spread
             const arbAlert = isUnderdogWinning && Math.abs(scores[0] - scores[1]) > 5;
 
             // 5. Win probability (transparent heuristic, not a sportsbook model):
@@ -331,7 +325,6 @@
             if (homeSpread === 0) {
                 logit = MARGIN_K * marginHome; // no line: drift from 50/50 with score only
             } else {
-                // Correct sign: favorite (negative homeSpread) => positive logit contribution
                 logit = -LINE_K * homeSpread + MARGIN_K * marginHome;
             }
             const pHome = clampProb(sigmoid(logit));
@@ -340,7 +333,6 @@
             const pAwayPct = 100 - pHomePct;
             const probLabel = `MODEL P(WIN): ${game.home} ${pHomePct}% | ${game.away} ${pAwayPct}% <span style="color:#666;font-weight:600;font-size:0.72rem;">(line prior + margin)</span>`;
 
-            // 6. Make the line more explicit: who is favorite/underdog?
             let lineLabel = "NO LINE";
             if (homeSpread !== 0) {
                 const favTeam = homeSpread < 0 ? game.home : game.away;

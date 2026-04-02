@@ -7,7 +7,6 @@ public class ScoreHub : Hub
 {
     public async Task SendScore(string scoreJson)
     {
-        // This sends the score to EVERYONE connected
         await Clients.All.SendAsync("ReceiveScore", scoreJson);
     }
 }
