@@ -16,20 +16,17 @@ builder.Services.AddCors(options => {
 builder.Services.AddSignalR();
 builder.Services.AddControllers();
 
-// Use "redis" as the host inside Docker; fall back to localhost for bare-metal dev
 var host = Environment.GetEnvironmentVariable("REDIS_HOST") ?? "localhost";
 
 builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>
     ConnectionMultiplexer.Connect($"{host}:6379"));
 
-// This tells .NET to run your Redis listener in the background
 builder.Services.AddHostedService<RedisSubscriberService>();
 
 var app = builder.Build();
 
 // 2. CONFIGURE ROUTES (The Addresses)
 
-// Old Reliable: Manual refresh route
 app.MapGet("/scores", async (IConnectionMultiplexer redisConn) => {
     var db = redisConn.GetDatabase();
     try 

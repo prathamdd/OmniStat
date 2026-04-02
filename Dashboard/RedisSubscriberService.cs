@@ -120,7 +120,6 @@ public class RedisSubscriberService : BackgroundService
                 else
                 {
                     var awayPoint = ParsePoint(awayOutcome?["point"]);
-                    // If away has +5.5 (away gets points), home is -5.5 (home lays points).
                     spread = awayPoint != 0d ? -awayPoint : 0d;
                 }
             }
@@ -145,8 +144,7 @@ public class RedisSubscriberService : BackgroundService
                 await db.ListTrimAsync("arb_history", 0, 9);
             }
 
-            // Rare player feat tracking for Historical Value panel.
-            // We record these once per game/player/category:
+            // Rare player feat tracking for Historical Value panel:
             // - 50+ points
             // - 20+ rebounds
             // - 15+ assists
@@ -211,7 +209,6 @@ public class RedisSubscriberService : BackgroundService
             .Where(x => x is not null)
             .ToList();
 
-        // 2. Create a "Composite" object - this is the Arbiter's payload
         var arbiterPayload = new
         {
             LiveScores = scores,
@@ -221,7 +218,6 @@ public class RedisSubscriberService : BackgroundService
             TriggeredBy = triggeredBy
         };
 
-        // 3. Broadcast the combined data to the Frontend via SignalR
         var finalJson = JsonConvert.SerializeObject(arbiterPayload);
         await _hubContext.Clients.All.SendAsync("ReceiveScore", finalJson);
     }
