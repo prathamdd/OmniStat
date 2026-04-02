@@ -17,7 +17,7 @@ The project is built using a **microservices approach** to ensure low latency an
 
 | Layer | Technology |
 | :--- | :--- |
-| **Languages** | **C#, Python, JavaScript** |
+| **Languages** | **C#, Python, HTML** |
 | **Backend Framework** | **.NET 9, ASP.NET Core** |
 | **Real-Time Communication** | **SignalR (WebSockets)** |
 | **Data Streaming** | **Redis Pub/Sub** |
